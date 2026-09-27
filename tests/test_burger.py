@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 from praktikum.burger import Burger
+from praktikum.ingredient_types import INGREDIENT_TYPE_SAUCE, INGREDIENT_TYPE_FILLING
 
 
 class TestBurger:
@@ -36,30 +37,38 @@ class TestBurger:
         assert burger.ingredients[0] == mock_ing_2
 
     @pytest.mark.parametrize(
-        "start_idx, end_idx",
+        "start_idx, end_idx, expected_order",
         [
-            (0, 1),
-            (1, 0),
-        ]
+            (0, 2, ["ing_2", "ing_3", "ing_1"]),
+            (2, 0, ["ing_3", "ing_1", "ing_2"]),
+            (0, 1, ["ing_2", "ing_1", "ing_3"]),
+            (1, 0, ["ing_2", "ing_1", "ing_3"]),
+        ],
     )
-    def test_move_ingredient(self, start_idx, end_idx):
+    def test_move_ingredient(self, start_idx, end_idx, expected_order):
         burger = Burger()
         mock_ing_1 = Mock()
+        mock_ing_1.name = "ing_1"
         mock_ing_2 = Mock()
-        burger.add_ingredient(mock_ing_1)
-        burger.add_ingredient(mock_ing_2)
+        mock_ing_2.name = "ing_2"
+        mock_ing_3 = Mock()
+        mock_ing_3.name = "ing_3"
+
+        for ingredient in [mock_ing_1, mock_ing_2, mock_ing_3]:
+            burger.add_ingredient(ingredient)
 
         burger.move_ingredient(start_idx, end_idx)
 
-        assert burger.ingredients[end_idx] == (mock_ing_1 if start_idx == 0 else mock_ing_2)
+        actual_order = [ingredient.name for ingredient in burger.ingredients]
+        assert actual_order == expected_order
 
     @pytest.mark.parametrize(
         "bun_price, ing_prices, expected_total",
         [
-            (100.0, [50.0, 30.0], 280.0),   # 100 * 2 + 50 + 30 = 280
-            (0.0, [15.0], 15.0),            # 0 * 2 + 15 = 15
-            (50.5, [], 101.0),              # 50.5 * 2 = 101.0
-        ]
+            (100.0, [50.0, 30.0], 280.0),
+            (0.0, [15.0], 15.0),
+            (50.5, [], 101.0),
+        ],
     )
     def test_get_price(self, bun_price, ing_prices, expected_total):
         burger = Burger()
@@ -83,13 +92,13 @@ class TestBurger:
         burger.set_buns(mock_bun)
 
         mock_sauce = Mock()
-        mock_sauce.get_type.return_value = "sauce"
+        mock_sauce.get_type.return_value = INGREDIENT_TYPE_SAUCE
         mock_sauce.get_name.return_value = "chili"
         mock_sauce.get_price.return_value = 50.0
         burger.add_ingredient(mock_sauce)
 
         mock_filling = Mock()
-        mock_filling.get_type.return_value = "filling"
+        mock_filling.get_type.return_value = INGREDIENT_TYPE_FILLING
         mock_filling.get_name.return_value = "cutlet"
         mock_filling.get_price.return_value = 100.0
         burger.add_ingredient(mock_filling)
