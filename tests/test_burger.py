@@ -6,9 +6,12 @@ from praktikum.ingredient_types import INGREDIENT_TYPE_SAUCE, INGREDIENT_TYPE_FI
 
 class TestBurger:
 
-    def test_burger_initial_state(self):
+    def test_burger_initial_bun_is_none(self):
         burger = Burger()
         assert burger.bun is None
+
+    def test_burger_initial_ingredients_empty(self):
+        burger = Burger()
         assert burger.ingredients == []
 
     def test_set_buns(self):
@@ -17,23 +20,34 @@ class TestBurger:
         burger.set_buns(mock_bun)
         assert burger.bun == mock_bun
 
-    def test_add_ingredient(self):
+    def test_add_ingredient_increases_list_length(self):
         burger = Burger()
         mock_ingredient = Mock()
         burger.add_ingredient(mock_ingredient)
         assert len(burger.ingredients) == 1
+
+    def test_add_ingredient_stores_ingredient(self):
+        burger = Burger()
+        mock_ingredient = Mock()
+        burger.add_ingredient(mock_ingredient)
         assert burger.ingredients[0] == mock_ingredient
 
-    def test_remove_ingredient(self):
+    def test_remove_ingredient_decreases_list_length(self):
         burger = Burger()
         mock_ing_1 = Mock()
         mock_ing_2 = Mock()
         burger.add_ingredient(mock_ing_1)
         burger.add_ingredient(mock_ing_2)
-
         burger.remove_ingredient(0)
-
         assert len(burger.ingredients) == 1
+
+    def test_remove_ingredient_removes_correct_item(self):
+        burger = Burger()
+        mock_ing_1 = Mock()
+        mock_ing_2 = Mock()
+        burger.add_ingredient(mock_ing_1)
+        burger.add_ingredient(mock_ing_2)
+        burger.remove_ingredient(0)
         assert burger.ingredients[0] == mock_ing_2
 
     @pytest.mark.parametrize(
@@ -110,7 +124,7 @@ class TestBurger:
             "= sauce chili =\n"
             "= filling cutlet =\n"
             "(==== black bun ====)\n\n"
-            f"Price: {burger.get_price()}"
+            "Price: 350.0"
         )
 
         assert receipt == expected_receipt
